@@ -6,18 +6,20 @@ import { UserController } from './user.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([User]),
-        ClientsModule.register([{
-            name: 'AUTH_CLIENT',
-            transport: Transport.TCP,
-            options: {
-                host: 'localhost',
-                port: 3000
-            }
-        }])
-    ],
-    providers: [UserService],
-    controllers: [UserController],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    ClientsModule.register([
+      {
+        name: 'AUTH_CLIENT',
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 3000,
+        },
+      },
+    ]),
+  ],
+  providers: [UserService],
+  controllers: [UserController],
 })
 export class UserModule {}

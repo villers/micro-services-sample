@@ -13,9 +13,9 @@ import { UserModule } from './user/user.module';
       password: 'password',
       database: 'user',
       synchronize: true,
-      entities: [User]
+      entities: [User],
     }),
-    UserModule
+    UserModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
