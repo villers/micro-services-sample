@@ -22,6 +22,7 @@ import { ConfigService } from '@nestjs/config';
   ],
   controllers: [AuthController],
   providers: [
+    Logger,
     AuthService,
     LocalStrategy,
     JwtStrategy,

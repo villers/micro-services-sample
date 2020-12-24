@@ -4,9 +4,14 @@ import { MessagePattern } from '@nestjs/microservices';
 import { of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
+import { JsonWebTokenError } from 'jsonwebtoken';
+
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly logger: Logger,
+  ) {}
 
   @MessagePattern({ role: 'auth', cmd: 'ping' })
   ping(_: any) {
@@ -15,33 +20,56 @@ export class AuthController {
 
   @MessagePattern({ role: 'auth', cmd: 'login' })
   async login(data: { username: string; password: string }) {
-    Logger.log(data);
-    const user = await this.authService.validateUser(
-      data.username,
-      data.password,
-    );
+    this.logger.log(data);
 
-    return this.authService.login(user);
+    try {
+      const user = await this.authService.validateUser(
+        data.username,
+        data.password,
+      );
+
+      if (user === null) {
+        this.logger.log('invalid credential');
+        return false;
+      }
+
+      return this.authService.login(user);
+    } catch (e) {
+      this.logger.error(e);
+      return false;
+    }
   }
 
   @MessagePattern({ role: 'auth', cmd: 'check' })
-  async isLoggedIn(data) {
-    Logger.log(data);
+  async isLoggedIn({ jwt }: { jwt: string }) {
+    this.logger.log(jwt);
 
     try {
-      return this.authService.validateToken(data.jwt);
+      return this.authService.validateToken(jwt);
     } catch (e) {
-      Logger.log(e);
+      if (e instanceof JsonWebTokenError) {
+        return false;
+      }
+
+      this.logger.error(e);
       return false;
     }
   }
 
   @MessagePattern({ role: 'auth', cmd: 'get' })
-  getUserData(data): any {
+  getUserData({ jwt }: { jwt: string }): any {
+    this.logger.log(jwt);
+
     try {
-      return this.authService.getUserData(data.jwt);
+      this.authService.validateToken(jwt);
+
+      return this.authService.getUserData(jwt);
     } catch (e) {
-      Logger.log(e);
+      if (e instanceof JsonWebTokenError) {
+        return false;
+      }
+
+      this.logger.error(e);
       return false;
     }
   }
