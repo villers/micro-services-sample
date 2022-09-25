@@ -16,6 +16,10 @@ Accept: application/json
 GET http://localhost:2000/auth/ping
 Accept: application/json
 
+### All users
+GET http://localhost:2000/user
+Accept: application/json
+
 ### Login
 POST http://localhost:2000/auth/login
 Content-Type: application/x-www-form-urlencoded

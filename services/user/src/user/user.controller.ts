@@ -24,6 +24,11 @@ export class UserController {
     return this.userService.findOne({ username: data.username });
   }
 
+  @MessagePattern({ role: 'user', cmd: 'all' })
+  getAllUsers(): Promise<User[]> {
+    return this.userService.allUsers();
+  }
+
   @MessagePattern({ role: 'user', cmd: 'greet' })
   async greet(): Promise<string> {
     return 'Greetings authenticated user';

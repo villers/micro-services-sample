@@ -34,4 +34,18 @@ export class UserService {
       ),
     );
   }
+
+  async all() {
+    return lastValueFrom(
+      this.clientServiceUser.send({ role: 'user', cmd: 'all' }, {}).pipe(
+        timeout(15000),
+        catchError((err) => {
+          if (err instanceof TimeoutError) {
+            return throwError(() => new RequestTimeoutException());
+          }
+          return throwError(err);
+        }),
+      ),
+    );
+  }
 }
