@@ -9,4 +9,9 @@ export class UserController {
   ping() {
     return this.userService.ping();
   }
+
+  @Get('/user')
+  all() {
+    return this.userService.all();
+  }
 }

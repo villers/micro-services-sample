@@ -1,7 +1,7 @@
 import { Injectable, Inject, RequestTimeoutException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { timeout, catchError } from 'rxjs/operators';
-import { TimeoutError, throwError } from 'rxjs';
+import { TimeoutError, throwError, lastValueFrom } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync } from 'bcrypt';
 
@@ -14,18 +14,17 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.client
-      .send({ role: 'user', cmd: 'get' }, { username })
-      .pipe(
+    const user = await lastValueFrom(
+      this.client.send({ role: 'user', cmd: 'get' }, { username }).pipe(
         timeout(5000),
         catchError((err) => {
           if (err instanceof TimeoutError) {
-            return throwError(new RequestTimeoutException());
+            return throwError(() => new RequestTimeoutException());
           }
           return throwError(err);
         }),
-      )
-      .toPromise();
+      ),
+    );
 
     if (
       (user !== null && compareSync(password, user?.password)) ||

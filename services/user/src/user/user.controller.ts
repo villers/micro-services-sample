@@ -16,12 +16,17 @@ export class UserController {
 
   @MessagePattern({ role: 'user', cmd: 'create' })
   async createUser(data) {
-    return await this.userService.createUser(data);
+    return this.userService.createUser(data);
   }
 
   @MessagePattern({ role: 'user', cmd: 'get' })
   getUser(data: { username: string }): Promise<User> {
     return this.userService.findOne({ username: data.username });
+  }
+
+  @MessagePattern({ role: 'user', cmd: 'all' })
+  getAllUsers(): Promise<User[]> {
+    return this.userService.allUsers();
   }
 
   @MessagePattern({ role: 'user', cmd: 'greet' })

@@ -1,0 +1,38 @@
+# Gateway
+
+### Status page
+GET http://localhost:2000/status
+Accept: application/json
+
+### Ping all services
+GET http://localhost:2000/ping
+Accept: application/json
+
+### Ping user services
+GET http://localhost:2000/user/ping
+Accept: application/json
+
+### Ping auth services
+GET http://localhost:2000/auth/ping
+Accept: application/json
+
+### All users
+GET http://localhost:2000/user
+Accept: application/json
+
+### Login
+POST http://localhost:2000/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=username&password=password
+
+### Register
+POST http://localhost:2000/auth/register
+Content-Type: application/x-www-form-urlencoded
+
+username=username&password=password&name=name&email=email@email.com
+
+### me
+GET http://localhost:2000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoxLCJ1c2VybmFtZSI6InVzZXJuYW1lIiwicGFzc3dvcmQiOiIkMmIkMTAkekh5UldBVWFhb1lML1p4cWpWUmhQZUhDa05PZDh0VGxCb1Zva3FOUmFVTUxzckVLUmVmUE8iLCJuYW1lIjoibmFtZSIsImVtYWlsIjoiZW1haWxAZW1haWwuY29tIiwiY3JlYXRlZEF0IjoiMjAyMi0wOS0yNVQxOToxNDoyNi44NTdaIn0sInN1YiI6MSwiaWF0IjoxNjY0MTM4NTUwLCJleHAiOjE2NjQxMzg2MTB9.VCbQnqfXLkpryuMD_2zgT8V59El6AY3Ou3Rat8LrVdE
+Accept: application/json
