@@ -1,7 +1,7 @@
 import { Inject, Injectable, RequestTimeoutException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, map, timeout } from 'rxjs/operators';
-import { throwError, TimeoutError } from 'rxjs';
+import { lastValueFrom, throwError, TimeoutError } from 'rxjs';
 import { UserService } from './user.service';
 
 @Injectable()
@@ -26,18 +26,17 @@ export class AuthService {
   async login(payload: { username: string; password: string }) {
     const pattern = { role: 'auth', cmd: 'login' };
 
-    return await this.clientServiceAuth
-      .send<string>(pattern, payload)
-      .pipe(
+    return lastValueFrom(
+      this.clientServiceAuth.send<string>(pattern, payload).pipe(
         timeout(5000),
         catchError((err) => {
           if (err instanceof TimeoutError) {
-            return throwError(new RequestTimeoutException());
+            return throwError(() => new RequestTimeoutException());
           }
           return throwError(err);
         }),
-      )
-      .toPromise();
+      ),
+    );
   }
 
   async register(data) {
@@ -45,17 +44,16 @@ export class AuthService {
   }
 
   async getUserData(jwt: string) {
-    return await this.clientServiceAuth
-      .send({ role: 'auth', cmd: 'get' }, { jwt })
-      .pipe(
+    return lastValueFrom(
+      this.clientServiceAuth.send({ role: 'auth', cmd: 'get' }, { jwt }).pipe(
         timeout(5000),
         catchError((err) => {
           if (err instanceof TimeoutError) {
-            return throwError(new RequestTimeoutException());
+            return throwError(() => new RequestTimeoutException());
           }
           return throwError(err);
         }),
-      )
-      .toPromise();
+      ),
+    );
   }
 }

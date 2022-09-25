@@ -1,8 +1,7 @@
 import { Inject, Injectable, RequestTimeoutException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, map, timeout } from 'rxjs/operators';
-import { TimeoutError } from 'rxjs/internal/util/TimeoutError';
-import { throwError } from 'rxjs';
+import { lastValueFrom, throwError, TimeoutError } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -23,17 +22,16 @@ export class UserService {
   }
 
   async create(data) {
-    return await this.clientServiceUser
-      .send({ role: 'user', cmd: 'create' }, data)
-      .pipe(
+    return lastValueFrom(
+      this.clientServiceUser.send({ role: 'user', cmd: 'create' }, data).pipe(
         timeout(15000),
         catchError((err) => {
           if (err instanceof TimeoutError) {
-            return throwError(new RequestTimeoutException());
+            return throwError(() => new RequestTimeoutException());
           }
           return throwError(err);
         }),
-      )
-      .toPromise();
+      ),
+    );
   }
 }

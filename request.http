@@ -1,0 +1,26 @@
+# Gateway
+
+### Status page
+GET http://localhost:2000/status
+Accept: application/json
+
+### Ping all services
+GET http://localhost:2000/ping
+Accept: application/json
+
+### Ping user services
+GET http://localhost:2000/user/ping
+Accept: application/json
+
+### Ping auth services
+GET http://localhost:2000/auth/ping
+Accept: application/json
+
+### Login to auth service
+POST http://localhost:2000/auth/login
+
+Content-Type: application/json
+{
+  "username": "name",
+  "password": "password"
+}

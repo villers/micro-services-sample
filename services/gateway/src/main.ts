@@ -13,8 +13,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
-  await app.listen(port, '0.0.0.0', () =>
-    Logger.log(`Gateway microservice running on port ${port}`),
-  );
+  await app.listen(port, '0.0.0.0');
+  Logger.log(`Gateway microservice running on port ${port}`);
 }
 bootstrap();

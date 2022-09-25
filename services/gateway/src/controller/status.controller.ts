@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
-import { map } from 'rxjs/operators';
-import { zip } from 'rxjs';
+import { delay, map } from 'rxjs/operators';
+import { of, zip } from 'rxjs';
 
 @Controller()
 export class StatusController {
@@ -10,6 +10,11 @@ export class StatusController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
+
+  @Get('/status')
+  status() {
+    return of('ok').pipe(delay(1000));
+  }
 
   @Get('/ping')
   ping() {
