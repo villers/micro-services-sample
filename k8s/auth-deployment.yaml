@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: auth-env
+          image: micro-services-sample-auth:latest
+          imagePullPolicy: Never
+          name: auth
+          ports:
+            - containerPort: 3000
+              name: socket
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 5
+            tcpSocket:
+              port: 3000
+          readinessProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 5
+            tcpSocket:
+              port: 3000
