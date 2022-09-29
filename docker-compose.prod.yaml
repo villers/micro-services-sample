@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  gateway:
+    build:
+      context: services/gateway
+      target: production
+    ports:
+      - 2000:2000
+    environment:
+      AUTH_SERVICE: auth
+      USER_SERVICE: user
+    env_file:
+      - ./services/gateway/.env
+
+  auth:
+    build:
+      context: services/auth
+      target: production
+    environment:
+      USER_SERVICE: user
+    env_file:
+      - ./services/auth/.env
+
+  user:
+    build:
+      context: services/user
+      target: production
+    environment:
+      AUTH_SERVICE: auth
+      POSTGRES_URL: postgresql://user:password@postgres:5432/user
+    env_file:
+      - ./services/user/.env
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user
+    ports:
+      - 5432:5432
