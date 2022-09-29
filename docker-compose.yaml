@@ -2,61 +2,43 @@ version: "3.7"
 
 services:
   gateway:
+    extends:
+      file: docker-compose.prod.yaml
+      service: gateway
     build:
-      context: services/gateway
-      target: development
+      target: debug
     volumes:
       - ./services/gateway:/usr/src/app:cached
       - /usr/src/app/node_modules
     ports:
       - 2000:2000
       - 2001:9229
-    command: npm run start:debug
-    environment:
-      AUTH_SERVICE: auth
-      USER_SERVICE: user
-    env_file:
-      - ./services/gateway/.env
 
   auth:
+    extends:
+      file: docker-compose.prod.yaml
+      service: auth
     build:
-      context: services/auth
-      target: development
+      target: debug
     volumes:
       - ./services/auth:/usr/src/app:cached
       - /usr/src/app/node_modules
     ports:
       - 3001:9229
-    command: npm run start:debug
-    environment:
-      USER_SERVICE: user
-    env_file:
-      - ./services/auth/.env
 
   user:
+    extends:
+      file: docker-compose.prod.yaml
+      service: user
     build:
-      context: services/user
-      target: development
+      target: debug
     volumes:
       - ./services/user:/usr/src/app:cached
       - /usr/src/app/node_modules
     ports:
       - 4001:9229
-    command: npm run start:debug
-    environment:
-      AUTH_SERVICE: auth
-      POSTGRES_URL: postgresql://user:password@postgres:5432/user
-    env_file:
-      - ./services/user/.env
-    depends_on:
-      - postgres
 
   postgres:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: user
-    ports:
-      - 5432:5432
+    extends:
+      file: docker-compose.prod.yaml
+      service: postgres
