@@ -1,0 +1,41 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: micro-services-sample
+build:
+  local:
+    useBuildkit: true
+  artifacts:
+  - image: micro-services-sample-auth
+    context: services/auth
+    docker:
+      dockerfile: Dockerfile
+      target: production
+  - image: micro-services-sample-gateway
+    context: services/gateway
+    docker:
+      dockerfile: Dockerfile
+      target: production
+  - image: micro-services-sample-user
+    context: services/user
+    docker:
+      dockerfile: Dockerfile
+      target: production
+deploy:
+  kubectl:
+    manifests:
+    - k8s/auth-deployment.yaml
+    - k8s/auth-env-configmap.yaml
+    - k8s/auth-hpa.yaml
+    - k8s/auth-service.yaml
+    - k8s/gateway-deployment.yaml
+    - k8s/gateway-env-configmap.yaml
+    - k8s/gateway-hpa.yaml
+    - k8s/gateway-ingress.yaml
+    - k8s/gateway-service.yaml
+    - k8s/postgres-deployment.yaml
+    - k8s/postgres-service.yaml
+    - k8s/user-deployment.yaml
+    - k8s/user-env-configmap.yaml
+    - k8s/user-hpa.yaml
+    - k8s/user-service.yaml

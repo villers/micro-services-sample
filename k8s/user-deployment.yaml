@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: user
+  name: user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: user
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: user-env
+          image: micro-services-sample-user:latest
+          imagePullPolicy: Never
+          name: user
+          ports:
+            - containerPort: 4000
+              name: socket
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 5
+            tcpSocket:
+              port: 4000
+          readinessProbe:
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 5
+            tcpSocket:
+              port: 4000
