@@ -22,20 +22,119 @@ build:
       dockerfile: Dockerfile
       target: production
 deploy:
-  kubectl:
-    manifests:
-    - k8s/auth-deployment.yaml
-    - k8s/auth-env-configmap.yaml
-    - k8s/auth-hpa.yaml
-    - k8s/auth-service.yaml
-    - k8s/gateway-deployment.yaml
-    - k8s/gateway-env-configmap.yaml
-    - k8s/gateway-hpa.yaml
-    - k8s/gateway-ingress.yaml
-    - k8s/gateway-service.yaml
-    - k8s/postgres-deployment.yaml
-    - k8s/postgres-service.yaml
-    - k8s/user-deployment.yaml
-    - k8s/user-env-configmap.yaml
-    - k8s/user-hpa.yaml
-    - k8s/user-service.yaml
+  helm:
+    releases:
+      - name: gateway
+        chartPath: ./chart
+        createNamespace: true
+        imageStrategy:
+          helm: {}
+        artifactOverrides:
+          image: micro-services-sample-gateway
+        overrides:
+          fullnameOverride: gateway
+          service:
+            port: 2000
+          env:
+            AUTH_SERVICE: auth
+            AUTH_SERVICE_PORT: "2000"
+            PORT: "2000"
+            USER_SERVICE: user
+            USER_SERVICE_PORT: "2000"
+          livenessProbe:
+            httpGet:
+              port: 2000
+              path: /status
+          readinessProbe:
+            httpGet:
+              port: 2000
+              path: /status
+          autoscaling:
+            enabled: true
+            minReplicas: 1
+            maxReplicas: 3
+            targetCPUUtilizationPercentage: 50
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ingress:
+            enabled: true
+            className: nginx
+            hosts:
+              - host: gateway.127.0.0.1.nip.io
+                paths:
+                  - path: /
+                    pathType: ImplementationSpecific
+
+      - name: auth
+        chartPath: ./chart
+        createNamespace: true
+        imageStrategy:
+          helm: {}
+        artifactOverrides:
+          image: micro-services-sample-auth
+        overrides:
+          fullnameOverride: auth
+          service:
+            port: 2000
+          env:
+            PORT: "2000"
+            USER_SERVICE: user
+            USER_SERVICE_PORT: "2000"
+          livenessProbe:
+            tcpSocket:
+              port: 2000
+          readinessProbe:
+            tcpSocket:
+              port: 2000
+          autoscaling:
+            enabled: true
+            minReplicas: 1
+            maxReplicas: 3
+            targetCPUUtilizationPercentage: 50
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+      - name: user
+        chartPath: ./chart
+        createNamespace: true
+        imageStrategy:
+          helm: {}
+        artifactOverrides:
+          image: micro-services-sample-user
+        overrides:
+          fullnameOverride: user
+          service:
+            port: 2000
+          env:
+            AUTH_SERVICE: auth
+            AUTH_SERVICE_PORT: "2000"
+            PORT: "2000"
+            POSTGRES_URL: postgresql://user:password@postgres:5432/user
+          livenessProbe:
+            tcpSocket:
+              port: 2000
+          readinessProbe:
+            tcpSocket:
+              port: 2000
+          autoscaling:
+            enabled: true
+            minReplicas: 1
+            maxReplicas: 3
+            targetCPUUtilizationPercentage: 50
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
