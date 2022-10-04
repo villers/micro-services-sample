@@ -68,6 +68,26 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+livenessProbe:
+  initialDelaySeconds: 1
+  periodSeconds: 2
+  timeoutSeconds: 2
+  successThreshold: 1
+  failureThreshold: 5
+  httpGet:
+    port: 2000
+    path: /status
+
+readinessProbe:
+  initialDelaySeconds: 1
+  periodSeconds: 2
+  timeoutSeconds: 2
+  successThreshold: 1
+  failureThreshold: 5
+  httpGet:
+    port: 2000
+    path: /status
+
 autoscaling:
   enabled: false
   minReplicas: 1
