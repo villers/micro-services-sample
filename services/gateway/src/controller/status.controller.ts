@@ -13,7 +13,7 @@ export class StatusController {
 
   @Get('/status')
   status() {
-    return of('ok').pipe(delay(1000));
+    return of('ok');//.pipe(delay(1000));
   }
 
   @Get('/ping')

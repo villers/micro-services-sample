@@ -6,17 +6,17 @@ build:
   local:
     useBuildkit: true
   artifacts:
-  - image: micro-services-sample-auth
+  - image: us.gcr.io/stream-k8s-micro-service/auth
     context: services/auth
     docker:
       dockerfile: Dockerfile
       target: production
-  - image: micro-services-sample-gateway
+  - image: us.gcr.io/stream-k8s-micro-service/gateway
     context: services/gateway
     docker:
       dockerfile: Dockerfile
       target: production
-  - image: micro-services-sample-user
+  - image: us.gcr.io/stream-k8s-micro-service/user
     context: services/user
     docker:
       dockerfile: Dockerfile
@@ -30,9 +30,11 @@ deploy:
         imageStrategy:
           helm: {}
         artifactOverrides:
-          image: micro-services-sample-gateway
+          image: us.gcr.io/stream-k8s-micro-service/gateway
         overrides:
           fullnameOverride: gateway
+          service:
+            port: 2000
           env:
             AUTH_SERVICE: auth
             AUTH_SERVICE_PORT: "2000"
@@ -63,7 +65,7 @@ deploy:
             enabled: true
             className: nginx
             hosts:
-              - host: gateway.127.0.0.1.nip.io
+              - host: gateway.34.125.206.209.nip.io
                 paths:
                   - path: /
                     pathType: ImplementationSpecific
@@ -74,9 +76,11 @@ deploy:
         imageStrategy:
           helm: {}
         artifactOverrides:
-          image: micro-services-sample-auth
+          image: us.gcr.io/stream-k8s-micro-service/auth
         overrides:
           fullnameOverride: auth
+          service:
+            port: 2000
           env:
             PORT: "2000"
             USER_SERVICE: user
@@ -106,9 +110,11 @@ deploy:
         imageStrategy:
           helm: {}
         artifactOverrides:
-          image: micro-services-sample-user
+          image: us.gcr.io/stream-k8s-micro-service/user
         overrides:
           fullnameOverride: user
+          service:
+            port: 2000
           env:
             AUTH_SERVICE: auth
             AUTH_SERVICE_PORT: "2000"
