@@ -15,7 +15,7 @@ export class AuthController {
 
   @MessagePattern({ role: 'auth', cmd: 'ping' })
   ping(_: any) {
-    return of('pong').pipe(delay(1000));
+    return of('pong');//.pipe(delay(1000));
   }
 
   @MessagePattern({ role: 'auth', cmd: 'login' })
