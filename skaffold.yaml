@@ -33,6 +33,8 @@ deploy:
           image: micro-services-sample-gateway
         overrides:
           fullnameOverride: gateway
+          service:
+            port: 2000
           env:
             AUTH_SERVICE: auth
             AUTH_SERVICE_PORT: "2000"
@@ -77,6 +79,8 @@ deploy:
           image: micro-services-sample-auth
         overrides:
           fullnameOverride: auth
+          service:
+            port: 2000
           env:
             PORT: "2000"
             USER_SERVICE: user
@@ -109,6 +113,8 @@ deploy:
           image: micro-services-sample-user
         overrides:
           fullnameOverride: user
+          service:
+            port: 2000
           env:
             AUTH_SERVICE: auth
             AUTH_SERVICE_PORT: "2000"
