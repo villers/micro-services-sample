@@ -11,7 +11,7 @@ export class UserController {
 
   @MessagePattern({ role: 'user', cmd: 'ping' })
   ping(_: any) {
-    return of('pong').pipe(delay(1000));
+    return of('pong');//.pipe(delay(1000));
   }
 
   @MessagePattern({ role: 'user', cmd: 'create' })
