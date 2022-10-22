@@ -1,0 +1,40 @@
+name: Deploy to GKE
+on:
+  pull_request:
+
+env:
+  SKAFFOLD_VERSION: v1.39.2
+  CLUSTER_NAME: cluster-1
+  CLUSTER_ZONE: us-central1-c
+  PROJECT_NAME: stream-k8s-micro-service
+
+jobs:
+  deploy:
+    runs-on:
+      - ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+
+    - name: configure docker registry
+      run: gcloud --quiet auth configure-docker
+
+    - name: 'install skaffold'
+      run: |
+        curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/${{ env.SKAFFOLD_VERSION }}/skaffold-linux-amd64
+        mkdir -p $HOME/.local/bin
+        chmod +x skaffold
+        mv skaffold $HOME/.local/bin/skaffold
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: connect to cluster gke
+      run: gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --zone ${{ env.CLUSTER_ZONE }} --project ${{ env.PROJECT_NAME }}
+
+    - name: Build and deploy app
+      run: skaffold run
